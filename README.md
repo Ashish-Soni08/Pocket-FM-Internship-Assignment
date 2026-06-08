@@ -1,74 +1,60 @@
-# Pocket FM Internship Assignment
+# ZerveHack — Kindle Bestseller Data Extraction
 
-This repository contains the submission artifacts for the Pocket FM AI-assisted data extraction assignment.
+An AI-assisted web scraping project that extracts structured data from Amazon's [Kindle Best Sellers – Paranormal Romance](https://www.amazon.com/Best-Sellers-Kindle-Store-Paranormal-Romance/zgbs/digital-text/6190484011) page. Built as an intern assignment for **Pocket FM**.
 
-## What This Repository Includes
+## Project Structure
 
-- `kindle_paranormal_romance_bestsellers.csv`: Final structured dataset (50 books).
-- `workflow.md`: Process note, AI prompt log, scaling ideas, and observations.
-- `Intern_assignment.md`: Original assignment brief and requirements.
-- `LICENSE`: Project license.
+```
+ZerveHack/
+├── kindle_paranormal_romance_bestsellers.csv   # Final dataset (50 books)
+├── workflow.md                                  # Process note, AI prompt log & observations
+├── Intern_assignment.md                         # Original assignment brief
+└── LICENSE
+```
 
-## Assignment Summary
+## What's Inside
 
-The assignment required extracting data from:
+### Dataset (`kindle_paranormal_romance_bestsellers.csv`)
 
-1. The Amazon Kindle Paranormal Romance bestseller listing page.
-2. Each listed book's product page.
+50 books scraped from Amazon's Paranormal Romance bestseller list, with the following fields:
 
-Expected data points included ranking, title, author, ratings, reviews, pricing, URL, and selected metadata from product pages (description, publisher, publication date).
+| Field | Description |
+|---|---|
+| `rank` | Bestseller rank (1–50) |
+| `title` | Book title |
+| `author` | Author name |
+| `rating` | Average rating (numeric) |
+| `number_of_reviews` | Total review count (integer) |
+| `price` | Listed price |
+| `book_url` | Direct Amazon product URL |
+| `description` | Book blurb (from individual product page) |
+| `publisher` | Publisher name |
+| `publication_date` | Standardized to YYYY-MM-DD |
 
-## Dataset Overview
+### Workflow Document (`workflow.md`)
 
-File: `kindle_paranormal_romance_bestsellers.csv`
+A detailed write-up covering:
+- **Process / Approach** — tools used, scraping strategy, edge cases encountered
+- **AI Prompt Log** — every prompt used with Firecrawl, annotated with reasoning
+- **3 Observations** — insights from the final dataset
 
-- Total records: 50 books
-- Header columns:
-	- `rank`
-	- `title`
-	- `author`
-	- `rating`
-	- `number_of_reviews`
-	- `price`
-	- `book_url`
-	- `description`
-	- `publisher`
-	- `publication_date`
+## Tools Used
 
-## Data Notes
+- **[Firecrawl](https://firecrawl.dev)** (MCP Server) — JavaScript-aware web scraping with LLM-powered JSON extraction
+- **Claude Opus 4.6 Thinking** via Antigravity — orchestration, data cleaning, and consolidation
 
-- Ratings are stored as numeric decimals where available.
-- Review counts are stored as integers where available.
-- Publication dates are standardized to `YYYY-MM-DD` when present.
-- Some values may be missing and are intentionally left blank or marked as unavailable instead of guessed.
-- Prices may contain mixed currencies depending on source session/region.
+## Key Challenges
 
-## How To Use This Repository
+- Amazon lazy-loads books beyond rank ~30, requiring scroll actions
+- Live ranking shifts between scrapes caused duplicates and gaps
+- Batch extraction (`firecrawl_extract`) was unreliable for Amazon SPAs; switched to 50 individual scrapes
+- No local Python environment — all merging/deduplication handled in-context by the AI
 
-### 1) Review the assignment context
+## Scaling Considerations
 
-Read `Intern_assignment.md` to understand goals and deliverables.
-
-### 2) Understand the extraction workflow
-
-Read `workflow.md` for:
-
-- Tooling choices
-- Extraction strategy
-- Prompt history
-- Edge cases and trade-offs
-- Scaling recommendations
-
-### 3) Analyze the dataset
-
-Open `kindle_paranormal_romance_bestsellers.csv` in Excel, Google Sheets, or any data analysis tool.
-
-Suggested checks:
-
-- Validate rank continuity (`1` through `50`).
-- Inspect missing values in `publisher` and `publication_date`.
-- Compare `rank` against `number_of_reviews` for trend analysis.
-
-## Reproducibility
-
-This repository stores final deliverables and documentation. It does not include an executable scraping script. The extraction process, prompts, and decisions used to generate the dataset are fully documented in `workflow.md`.
+To run this pipeline across many Kindle categories at scale:
+1. Parameterize the category URL
+2. Script scroll-based pagination in a loop
+3. Queue scrapes with rate limiting (e.g. 5 concurrent)
+4. Add caching + exponential-backoff retry logic
+5. Schedule with a cron job for time-series rank tracking
