@@ -1,11 +1,11 @@
-# ZerveHack — Kindle Bestseller Data Extraction
+# Kindle Bestseller Data Extraction
 
 An AI-assisted web scraping project that extracts structured data from Amazon's [Kindle Best Sellers – Paranormal Romance](https://www.amazon.com/Best-Sellers-Kindle-Store-Paranormal-Romance/zgbs/digital-text/6190484011) page. Built as an intern assignment for **Pocket FM**.
 
 ## Project Structure
 
 ```
-ZerveHack/
+.
 ├── kindle_paranormal_romance_bestsellers.csv   # Final dataset (50 books)
 ├── workflow.md                                  # Process note, AI prompt log & observations
 ├── Intern_assignment.md                         # Original assignment brief
